@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CoffeeOK.cs" />
+    <Compile Include="Coffee_Process.cs" />
     <Compile Include="CoffeMessageBox.cs" />
     <Compile Include="ConnectControlBoard.cs" />
     <Compile Include="CoffeeOK_Control.cs">
