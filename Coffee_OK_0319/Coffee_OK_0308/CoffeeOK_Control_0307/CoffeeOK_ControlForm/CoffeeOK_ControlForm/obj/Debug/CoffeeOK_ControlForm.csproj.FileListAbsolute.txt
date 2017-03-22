@@ -83,3 +83,6 @@ F:\Coffee_OK_0319\Coffee_OK_0308\CoffeeOK_Control_0307\CoffeeOK_ControlForm\Coff
 F:\Coffee_OK_0319\Coffee_OK_0308\CoffeeOK_Control_0307\CoffeeOK_ControlForm\CoffeeOK_ControlForm\obj\Debug\CoffeeOK_ControlForm.CoffeeOK_Control.resources
 F:\Coffee_OK_0319\Coffee_OK_0308\CoffeeOK_Control_0307\CoffeeOK_ControlForm\CoffeeOK_ControlForm\obj\Debug\CoffeeOK_ControlForm.Properties.Resources.resources
 F:\Coffee_OK_0319\Coffee_OK_0308\CoffeeOK_Control_0307\CoffeeOK_ControlForm\CoffeeOK_ControlForm\obj\Debug\CoffeeOK_ControlForm.csproj.GenerateResource.Cache
+C:\bf\CoffeeOK\Coffee_OK_0319\Coffee_OK_0308\CoffeeOK_Control_0307\CoffeeOK_ControlForm\CoffeeOK_ControlForm\bin\Debug\CoffeeOK_ControlForm.exe.config
+C:\bf\CoffeeOK\Coffee_OK_0319\Coffee_OK_0308\CoffeeOK_Control_0307\CoffeeOK_ControlForm\CoffeeOK_ControlForm\obj\Debug\CoffeeOK_ControlForm.exe
+C:\bf\CoffeeOK\Coffee_OK_0319\Coffee_OK_0308\CoffeeOK_Control_0307\CoffeeOK_ControlForm\CoffeeOK_ControlForm\obj\Debug\CoffeeOK_ControlForm.pdb
