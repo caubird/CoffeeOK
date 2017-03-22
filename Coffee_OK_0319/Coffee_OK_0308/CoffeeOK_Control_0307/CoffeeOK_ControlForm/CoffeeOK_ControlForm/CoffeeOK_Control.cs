@@ -31,10 +31,20 @@ namespace CoffeeOK_ControlForm
         bool init_flag = false;
 
         bool RobertInited_Flag = false;
+
+       
+
+
         public CoffeeOK_Control()
         {
             InitializeComponent();
+            //
+            TasksInit();
+
+            //
         }
+
+        
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -113,9 +123,34 @@ namespace CoffeeOK_ControlForm
             }
             #region 此处定义任务类型，1为泡咖啡任务，2为取咖啡任务，3为丢弃咖啡任务
 
-            #endregion
+           
             if (TaskNow.CodeID == "1")
-            {
+            {   //工艺链下发
+                switch (int.Parse(TaskNow.processid))
+                {
+                    case 1:
+                        break;
+                    case 2:
+                        break;
+                    case 3:
+                        break;
+                    case 4:
+                        break;
+                    case 5:
+                        break;
+                    case 6:
+                        break;
+                    case 7:
+                        break;
+                    case 8:
+                        break;
+                    case 9:
+                        break;
+                    case 10:
+                        break;
+                    case 11:
+                        break;
+                }
                 step = 1;
                 StopStep = 5;
             }
@@ -133,6 +168,8 @@ namespace CoffeeOK_ControlForm
                 step = 7;
                 StopStep = 7;
             }
+
+            #endregion
             MainTimer.Interval = 1000;
             DB_CheckTimer.Interval = 1000;
             //if(timer1.is )
@@ -683,7 +720,7 @@ namespace CoffeeOK_ControlForm
                     MySqlDataAdapter mda1 = new MySqlDataAdapter(sql1, conn);
                     mda1.Fill(ds1, "claim_goods_list");
 
-                    string ListID = ds1.Tables[0].Rows[0][7].ToString();
+                    string ProcessID = ds1.Tables[0].Rows[0][6].ToString();
                     TaskTable.Insert(i,
                         new Task(
                         ds.Tables[0].Rows[i][0].ToString(),
@@ -692,8 +729,9 @@ namespace CoffeeOK_ControlForm
                         ds.Tables[0].Rows[i][3].ToString(),
                         ds.Tables[0].Rows[i][4].ToString(),
                         ds.Tables[0].Rows[i][5].ToString(),
-                        ListID
-                        ));
+                        ProcessID
+                        )
+                        );
 
                 }
             }
