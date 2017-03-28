@@ -16,7 +16,8 @@ namespace CoffeeOK_ControlForm
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new CoffeeOK_Control());
+            Application.Run(new MissionComplete ());// new CoffeeOK_Control_0322());
+            //Application.Run(new CoffeeOK_Control_0322());
         }
     }
 }

@@ -18,11 +18,15 @@ namespace CoffeeOK_ControlForm
         public byte[] Order_ControlBoard_ReleaseACup = { 0x55, 0xAA, 0x02, 0x04, 0x00, 0x01, 0x01 };
         public byte[] Order_ControlBoard_ChangeCupQueue = { 0x55, 0xAA, 0x02, 0x04, 0x00, 0x01, 0x02 };
         public byte[] Order_ControlBoard_AddSeasoning1 = { 0x55, 0xAA, 0x02, 0x04, 0x00, 0x01, 0x03 };
+        public byte[] Order_ControlBoard_AddSeasoning1_Half = { 0x55, 0xAA, 0x02, 0x04, 0x00, 0x01, 0x03 };
         public byte[] Order_ControlBoard_AddSeasoning2 = { 0x55, 0xAA, 0x02, 0x04, 0x00, 0x01, 0x04 };
+        public byte[] Order_ControlBoard_AddSeasoning2_Half = { 0x55, 0xAA, 0x02, 0x04, 0x00, 0x01, 0x03 };
         public byte[] Order_ControlBoard_AddSeasoning3 = { 0x55, 0xAA, 0x02, 0x04, 0x00, 0x01, 0x05 };
+        public byte[] Order_ControlBoard_AddSeasoning3_Half = { 0x55, 0xAA, 0x02, 0x04, 0x00, 0x01, 0x03 };
         public byte[] Order_ControlBoard_AddSeasoning4 = { 0x55, 0xAA, 0x02, 0x04, 0x00, 0x01, 0x06 };
+        public byte[] Order_ControlBoard_AddSeasoning4_Half = { 0x55, 0xAA, 0x02, 0x04, 0x00, 0x01, 0x03 };
 
-        public byte[] Order_ControlBoard_ReplyOK = { 0x55, 0xAA, 0x02, 0x04, 0x00, 0x01, 0x00 };
+        public byte[] Order_ControlBoard_ReplyOK = { 0x55, 0xAA, 0x20, 0x04, 0x00, 0x01, 0x00 };
 
         #endregion 命令帧汇总
         #region 变量声明
@@ -31,10 +35,9 @@ namespace CoffeeOK_ControlForm
         {
             ReadTimer.Elapsed += ReadTimer_Elapsed;
             WriteTimer.Elapsed += WriteTimer_Elapsed;
-            
-
-
+            InitComPort("COM1");
         }
+
         List<byte[]> WriteFrameList = new List<byte[]>();
         List<byte[]> ReadFrameList = new List<byte[]>();
         int ResponseBytesPoint = 0;
@@ -97,7 +100,7 @@ namespace CoffeeOK_ControlForm
             ComPort.Encoding = Encoding.UTF8;
             ComPort.BaudRate = 115200;
             ComPort.PortName = portname;
-            ComPort.Open();
+            //ComPort.Open();
         }
         public void StartConnection()
         {
@@ -108,10 +111,22 @@ namespace CoffeeOK_ControlForm
             ReadTimer.Start();
         }
 
-        public void WriteRobot(byte[] inputstring)
+        public void WriteControlSystem(byte[] inputstring)
         {
             //if (Conn.State == ConnectionState.Closed)
             //       Conn.Open();
+
+            if (!ComPort.IsOpen)
+            {
+                try
+                {
+                    ComPort.Open();
+                }
+                catch
+                {//COM口初始化失败
+                    return;
+                }
+            }
             byte[] bytes = inputstring;// Encoding.UTF8.GetBytes(inputstring);//inputstring.Split(' ').Select(s => Convert.ToByte(s, 16)).ToArray();
             byte[] SHOW = bytes;
             byte crc = CRC_Compute(bytes,bytes.Length );
@@ -123,25 +138,26 @@ namespace CoffeeOK_ControlForm
             //AddSHOW[AddSHOW.Length - 2] = crc[0];
             AddSHOW[AddSHOW.Length - 1] = crc;
             ComPort.Write(AddSHOW, 0, AddSHOW.Length);
-            Thread.Sleep(200);
-            byte[] recivedata = new byte[ComPort.BytesToRead];
-            if (ComPort.BytesToRead >= 5)
-            {
-                bytes = new byte[ComPort.BytesToRead];
-                ComPort.Read(recivedata, 0, recivedata.Length);
-                byte temp = CRC_Compute(recivedata,recivedata.Length);
-                if (temp == recivedata[recivedata.Length - 1] )//注意高低位调换
-                {
+            Thread.Sleep(AddSHOW.Length / 10 + 1);
+            //Thread.Sleep(200);
+            //byte[] recivedata = new byte[ComPort.BytesToRead];
+            //if (ComPort.BytesToRead >= 5)
+            //{
+            //    bytes = new byte[ComPort.BytesToRead];
+            //    ComPort.Read(recivedata, 0, recivedata.Length);
+            //    byte temp = CRC_Compute(recivedata,recivedata.Length);
+            //    if (temp == recivedata[recivedata.Length - 1] )//注意高低位调换
+            //    {
                     
-                    ReadFrameList.Insert(ResponseBytesPoint,recivedata) ;
-                    ResponseBytesPoint++;
-                    //Console.ReadLine();
-                }
-                else
-                {
-                    //Console.WriteLine("接收数据错误");
-                }
-            }
+            //        ReadFrameList.Insert(ResponseBytesPoint,recivedata) ;
+            //        ResponseBytesPoint++;
+            //        //Console.ReadLine();
+            //    }
+            //    else
+            //    {
+            //        //Console.WriteLine("接收数据错误");
+            //    }
+            //}
         }
         private void WriteTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
@@ -229,12 +245,34 @@ namespace CoffeeOK_ControlForm
             {
                 return null;
             }
+            else
+            {
+                try
+                {
+                    sp1.Open();
+                }
+                catch
+                {
+                    return null;
+                }
+            }
             int counter = sp1.BytesToRead;
             byte[] bytes = new byte[counter];
             sp1.Read(bytes, 0, counter);
 
             return bytes;
         }
+
+        public byte[] ReadBackBytes()
+        {
+            //byte[] bytes = new byte[10];
+            int counter = ComPort.BytesToRead;
+            byte[] bytes = new byte[counter];
+            ComPort.Read(bytes, 0, counter);
+
+            return bytes;
+        }
+
         /// <summary>
         /// 协议内容分析
         /// </summary>
