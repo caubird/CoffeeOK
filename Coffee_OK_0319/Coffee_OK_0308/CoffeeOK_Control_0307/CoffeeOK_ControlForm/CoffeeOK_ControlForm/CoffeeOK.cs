@@ -32,6 +32,8 @@ namespace CoffeeOK
 
         System.Timers.Timer DoOrder = new System.Timers.Timer();
 
+       
+
         /// <summary>
         /// 读M550判断是否工作完成，若完成，则返回0x01,否则返回0x00
         /// </summary>
@@ -43,18 +45,21 @@ namespace CoffeeOK
         public byte[] RenewMissionMode = { 0x02, 0x05, 0x12, 0x26, 0x00, 0x00 };
 
         #region 执行指令程序1-8，顺序执行
-        public byte[] Order_DoMission1 = { 0x02, 0x05, 0x11, 0xF4, 0xFF, 0x00 };//M500
-        public byte[] Order_DoMission2 = { 0x02, 0x05, 0x11, 0xF5, 0xFF, 0x00 };//M501
-        public byte[] Order_DoMission3 = { 0x02, 0x05, 0x11, 0xF6, 0xFF, 0x00 };//M502
-        public byte[] Order_DoMission4 = { 0x02, 0x05, 0x11, 0xF7, 0xFF, 0x00 };//M503
-        public byte[] Order_DoMission5 = { 0x02, 0x05, 0x11, 0xF8, 0xFF, 0x00 };//M504
-        public byte[] Order_DoMission6 = { 0x02, 0x05, 0x11, 0xF9, 0xFF, 0x00 };//M505
-        public byte[] Order_DoMission7 = { 0x02, 0x05, 0x11, 0xFA, 0xFF, 0x00 };//M506
-        public byte[] Order_DoMission8 = { 0x02, 0x05, 0x11, 0xFB, 0xFF, 0x00 };//M507
+        public byte[] Order_DoMission1 = { 0x02, 0x05, 0x11, 0xF4, 0xFF, 0x00 };//M500 伸手取杯并等待M551置位，然后拿回杯子
+        public byte[] Order_DoMission2 = { 0x02, 0x05, 0x11, 0xF5, 0xFF, 0x00 };//M501 放咖啡杯到咖啡机，点击制作美式咖啡命令
+        public byte[] Order_DoMission3 = { 0x02, 0x05, 0x11, 0xF6, 0xFF, 0x00 };//M502 放咖啡杯到咖啡机，点击制作意式浓缩咖啡命令
+        public byte[] Order_DoMission4 = { 0x02, 0x05, 0x11, 0xF7, 0xFF, 0x00 };//M503 放杯子到调料位
+        public byte[] Order_DoMission5 = { 0x02, 0x05, 0x11, 0xF8, 0xFF, 0x00 };//M504 从调料位置放置杯子到出货位
+        public byte[] Order_DoMission6 = { 0x02, 0x05, 0x11, 0xF9, 0xFF, 0x00 };//M505 放咖啡杯到咖啡机，点击制作卡布奇诺咖啡命令
+        public byte[] Order_DoMission7 = { 0x02, 0x05, 0x11, 0xFA, 0xFF, 0x00 };//M506 放咖啡杯到咖啡机，点击制作拿铁咖啡命令
+        public byte[] Order_DoMission8 = { 0x02, 0x05, 0x11, 0xFB, 0xFF, 0x00 };//M507 从咖啡机放杯子到出货位，待机器人完善指令
 
+        /// <summary>
+        /// 继续取杯后的动作
+        /// </summary>
         public byte[] Order_DoMission1_Continue = { 0x02, 0x05, 0x12, 0x27, 0xFF, 0x00 };//M551
 
-        public byte[] Order_InitRobertWorkingCondition = { 0x02, 0x05, 0x12, 0x26, 0x00, 0x00 };
+        public byte[] Order_InitRobertWorkingCondition = { 0x02, 0x05, 0x12, 0x26, 0xFF, 0x00 };//M550
 
         public byte[] Order_RobotPowerOn = { 0x02, 0x05, 0x10, (byte)(0x60 + 13), 0xFF, 0x00 };//M109,远程上电
         public byte[] Order_RobotPowerOff = { 0x02, 0x05, 0x10, (byte)(0x60 + 13), 0x00, 0x00 };//M109,远程上电
@@ -188,6 +193,8 @@ namespace CoffeeOK
         {
             //if (Conn.State == ConnectionState.Closed)
             //       Conn.Open();
+
+
             byte[] bytes = inputstring;// Encoding.UTF8.GetBytes(inputstring);//inputstring.Split(' ').Select(s => Convert.ToByte(s, 16)).ToArray();
             byte[] SHOW = bytes;
             byte[] crc = CalculateCRC(bytes);
