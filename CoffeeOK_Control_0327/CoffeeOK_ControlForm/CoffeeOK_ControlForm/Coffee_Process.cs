@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MySql.Data;
+using MySql.Data.MySqlClient;
+using System.Data;
+using System.Collections;
+using System.Security.Cryptography;
 
 namespace CoffeeOK_ControlForm
 {
@@ -26,17 +31,18 @@ namespace CoffeeOK_ControlForm
         //工步14：出货窗口转动出货
         //####################################################################################
 
-        private int[] Process_Latte = { 0, 1, 2, 3, 7, 9, 12, 13,};
-        private int[] Process_Latte_HalfSugar = { 0, 1, 2, 3, 7, 10, 12, 13,};
-        private int[] Process_Latte_NoSugar = { 0, 1, 2, 3, 8, 13,};
-        private int[] Process_Black = { 0, 1, 2, 6, 8, 13,};
-        private int[] Process_AmaricanBlack = { 0, 1, 2, 5, 8, 13,};
-        private int[] Process_Mocha = { 0, 1, 2, 3, 7, 9, 11, 12, 13,};
-        private int[] Process_Mocha_HalfSugar = { 0, 1, 2, 3, 7, 10, 11, 12, 13,};
-        private int[] Process_Cappuccino = { 0, 1, 2, 4, 7, 9, 12, 13,};
-        private int[] Process_Cappuccino_HalfSugar = { 0, 1, 2, 4, 7, 10, 12, 13,};
-        private int[] Process_Cappuccino_NoSugar = { 0, 1, 2, 4, 8, 13,};
-        private int[] ThoughCoffee = { 14};
+        private int[] Process_Latte = { 0, 1, 2, 3, 7, 9, 12, 13, };
+        private int[] Process_Latte_HalfSugar = { 0, 1, 2, 3, 7, 10, 12, 13, };
+        private int[] Process_Latte_NoSugar = { 0, 1, 2, 3, 8, 13, };
+        private int[] Process_Black = { 0, 1, 2, 3, 6, 8, 13, };
+        private int[] Process_AmaricanBlack = { 0, 1, 2, 3, 5, 8, 13, };
+        private int[] Process_Mocha = { 0, 1, 2, 3, 7, 9, 11, 12, 13, };
+        private int[] Process_Mocha_HalfSugar = { 0, 1, 2, 3, 7, 10, 11, 12, 13, };
+        private int[] Process_Mocha_NoSugar = { 0, 1, 2, 3, 7, 11, 12, 13 };
+        private int[] Process_Cappuccino = { 0, 1, 2, 4, 7, 9, 12, 13, };
+        private int[] Process_Cappuccino_HalfSugar = { 0, 1, 2, 3, 4, 7, 10, 12, 13, };
+        private int[] Process_Cappuccino_NoSugar = { 0, 1, 2, 3, 4, 8, 13, };
+        private int[] ThoughCoffee = { 14 };
 
         public Coffee_Procedure[] ProcedureTable = new Coffee_Procedure[15];
 
@@ -125,7 +131,71 @@ namespace CoffeeOK_ControlForm
         }
 
     }
+    class Coffee_Process_FromDB
+    {
+        List<Coffee_Procedure> MissionLists = new List<Coffee_Procedure>();
+        string ProcessName = "";
+        int ProcessID = 0;
+        int ProductID = 0;
+        string ProductName = "";
+        string M_str_sqlcon = "server=localhost;user id=root;password=1234;database=coffee"; //根据自己的设置
+        public Coffee_Process_FromDB(int processid)
+        {
+            Get_Coffee_Process_FromDB(processid);
+        }
 
+        public int Get_ProcessID()
+        {
+            return ProcessID;
+        }
+
+        public void Get_Coffee_Process_FromDB(int processid)
+        {
+
+            MySqlConnection conn = null;
+            conn = new MySqlConnection(M_str_sqlcon);
+            conn.Open();
+            //MySqlCommand commn = new MySqlCommand("set names gb2312", conn);
+            MySqlCommand commn = new MySqlCommand("set names UTF8", conn);
+            commn.ExecuteNonQuery();
+            string sql = "select * from  Procedure_Process_Link where ProcessID =" + processid.ToString();
+            MySqlDataAdapter mda = new MySqlDataAdapter(sql, conn);
+            DataSet ds = new DataSet();
+            // mda.Fill(ds, "coffee_excute");
+            mda.Fill(ds, "Procedure_Process_Link");
+            //this.dataGridView1.DataSource = ds.Tables["coffee_execute"];
+            //任务表列顺序：ID,code_id,create_time,status,list_id,priority
+            //对应意义：    ID,代码，  创建时间，  执行状态,高级ID，优先级（数字越小越高）
+
+            //创建新的TaskTable
+            MissionLists = new List<Coffee_Procedure>();
+
+            //其中执行状态意义如下：0为未执行，1为正在执行，2为已完成
+            if (ds.Tables[0].Rows.Count > 0)
+            {
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                {
+                    string sql1 = "select * from Procedure where ProcedureID = '" + ds.Tables[0].Rows[i][0].ToString() + "'";
+                    DataSet ds1 = new DataSet();
+                    MySqlDataAdapter mda1 = new MySqlDataAdapter(sql1, conn);
+                    mda1.Fill(ds1, "claim_goods_list");
+
+                    string ProcessID = ds1.Tables[0].Rows[0][6].ToString();
+                    MissionLists.Insert(int.Parse(ds1.Tables[0].Rows[0][0].ToString()),
+                                    new Coffee_Procedure(
+                                    ds1.Tables[0].Rows[0][1].ToString(),
+                                    int.Parse(ds1.Tables[0].Rows[0][2].ToString()),
+                                    int.Parse(ds1.Tables[0].Rows[0][0].ToString())
+                                    )
+                                    );
+
+                }
+            }
+            conn.Close();
+        }
+
+
+    }
     class Coffee_Procedure
     {
         public String ProcedureName = "";

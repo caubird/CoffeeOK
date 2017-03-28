@@ -1257,7 +1257,8 @@ namespace CoffeeOK_ControlForm
         private void button9_Click(object sender, EventArgs e)
         {//
             // ConnectMysql_DB();
-            SetMysql_DB_TaskStatus(new Task("1", "1", DateTime.Now.ToString(), "2", "", "", ""));
+            //SetMysql_DB_TaskStatus(new Task("1", "1", DateTime.Now.ToString(), "2", "", "", ""));
+
 
             //InsertMysql_DB_TaskStatus(new Task("1", "1", DateTime.Now.ToString(), "0", "6", "1", "5"));
         }
