@@ -34,7 +34,7 @@ namespace CoffeeOK_ControlForm
 
         private Coffee_Process CoffeeProcessItem = new Coffee_Process();
 
-        int[] MissionList = new int[0];
+        List<Coffee_Procedure> MissionList = new List<Coffee_Procedure>();
         int MissionCounter = 0;
 
         public MissionComplete()
@@ -199,9 +199,9 @@ namespace CoffeeOK_ControlForm
                 RobertInited_Flag = true;
                 InitRobertWorkCondition();
             }
-            if (MissionList!=null && MissionList.Length > MissionCounter)
+            if (MissionList!=null && MissionList.Count  > MissionCounter)
             {
-                switch (CoffeeProcessItem.ProcedureNameList[MissionList[MissionCounter]])
+                switch (MissionList[MissionCounter].ProcedureName)
                 {
                     case "PickACup":
                         DoMitionOne();
@@ -234,7 +234,7 @@ namespace CoffeeOK_ControlForm
                         break;
                     case "PressAmaricanBlack":
                         if (RobertConnectItem.WorkingConditionFlag == true)
-                        {//机器人完成前面工步，才能执行此工布
+                        {//机器人完成前面工步，才能执行此工步
                             DoMitionEight();
                         }
                         //Sleep(CoffeeProcessItem.ProcedureTable[MissionList[MissionCounter]].WaitTimeAfterWork);
@@ -291,7 +291,7 @@ namespace CoffeeOK_ControlForm
                     default:
                         break;
                 }
-                Sleep(CoffeeProcessItem.ProcedureTable[MissionList[MissionCounter]].WaitTimeAfterWork);
+                Sleep(MissionList[MissionCounter].WaitTimeAfterWork);
 
             }
         }
@@ -328,8 +328,9 @@ namespace CoffeeOK_ControlForm
                     TaskTable[0].Status = "1";
                     SetMysql_DB_TaskStatus(TaskTable[0]);
                     TaskNow = TaskTable[0];
-
-                    MissionList = CoffeeProcessItem.GetProcedure(int.Parse(TaskNow.processid));
+                    Coffee_Process_FromDB cpf = new Coffee_Process_FromDB(int.Parse(TaskNow.processid));
+                    //MissionList = CoffeeProcessItem.GetProcedure();
+                    MissionList = cpf.Get_Coffee_Process_FromDB(int.Parse(TaskNow.processid));
 
                     Start_TaskAction();
                 }
@@ -399,9 +400,9 @@ namespace CoffeeOK_ControlForm
 
         private void MissionConvertControl()
         {
-            if (MissionCounter < MissionList.Length)
+            if (MissionCounter < MissionList.Count )
             {
-                step = MissionList[MissionCounter];
+                step = MissionList[MissionCounter].ProcedureNumber;
                 MissionCounter++;
             }
         }
@@ -659,6 +660,27 @@ namespace CoffeeOK_ControlForm
                 textBox1.Text += "命令重发" + (char)0x0d + (char)0x0a;
                 RleasACup();
                 return;
+            }
+        }
+
+        /// <summary>
+        /// 把咖啡从咖啡机直接移到出货位置
+        /// </summary>
+        private void DoMitionTen()
+        {
+            RobertConnectItem.WriteRobot(RobertConnectItem.Order_DoMission8);
+            byte[] Responsebytes = RobertConnectItem.ResponseBytesBuf;
+            if (Responsebytes[0] == RobertConnectItem.Order_DoMission4[0] && RobertConnectItem.Order_DoMission4[1] == Responsebytes[1])
+            {
+
+                //MessageBox.Show("写入命令成功!");
+
+            }
+            RobertConnectItem.ReadRobot(RobertConnectItem.ReadMissionMode);
+            byte[] bytes = RobertConnectItem.ReadBytesBuf;
+            if (bytes[0] == RobertConnectItem.ReadMissionMode[0] && RobertConnectItem.ReadMissionMode[1] == bytes[1])
+            {
+                //MessageBox.Show("读取命令成功!");
             }
         }
 
@@ -1257,9 +1279,9 @@ namespace CoffeeOK_ControlForm
         private void button9_Click(object sender, EventArgs e)
         {//
             // ConnectMysql_DB();
-            //SetMysql_DB_TaskStatus(new Task("1", "1", DateTime.Now.ToString(), "2", "", "", ""));
-
-
+            Coffee_Process_FromDB cpdb = new Coffee_Process_FromDB(20);
+            int id=cpdb.Get_ProcessID();
+            
             //InsertMysql_DB_TaskStatus(new Task("1", "1", DateTime.Now.ToString(), "0", "6", "1", "5"));
         }
 
@@ -1282,9 +1304,7 @@ namespace CoffeeOK_ControlForm
             byte[] Responsebytes = RobertConnectItem.ResponseBytesBuf;
             if (Responsebytes[0] == RobertConnectItem.Order_DoMission5[0] && RobertConnectItem.Order_DoMission5[1] == Responsebytes[1])
             {
-
                 //MessageBox.Show("写入命令成功!");
-
             }
             RobertConnectItem.ReadRobot(RobertConnectItem.ReadMissionMode);
             byte[] bytes = RobertConnectItem.ReadBytesBuf;
@@ -1296,7 +1316,6 @@ namespace CoffeeOK_ControlForm
             Thread.Sleep(1000);
             Thread.Sleep(1000);
             Thread.Sleep(1000);
-            //Tsleep(1000);
 
         }
 

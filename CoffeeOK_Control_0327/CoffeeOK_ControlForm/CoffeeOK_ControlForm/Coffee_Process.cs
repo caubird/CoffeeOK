@@ -34,14 +34,14 @@ namespace CoffeeOK_ControlForm
         private int[] Process_Latte = { 0, 1, 2, 3, 7, 9, 12, 13, };
         private int[] Process_Latte_HalfSugar = { 0, 1, 2, 3, 7, 10, 12, 13, };
         private int[] Process_Latte_NoSugar = { 0, 1, 2, 3, 8, 13, };
-        private int[] Process_Black = { 0, 1, 2, 3, 6, 8, 13, };
-        private int[] Process_AmaricanBlack = { 0, 1, 2, 3, 5, 8, 13, };
+        private int[] Process_Black = { 0, 1, 2, 6, 8, 13, };
+        private int[] Process_AmaricanBlack = { 0, 1, 2, 5, 8, 13, };
         private int[] Process_Mocha = { 0, 1, 2, 3, 7, 9, 11, 12, 13, };
         private int[] Process_Mocha_HalfSugar = { 0, 1, 2, 3, 7, 10, 11, 12, 13, };
         private int[] Process_Mocha_NoSugar = { 0, 1, 2, 3, 7, 11, 12, 13 };
         private int[] Process_Cappuccino = { 0, 1, 2, 4, 7, 9, 12, 13, };
-        private int[] Process_Cappuccino_HalfSugar = { 0, 1, 2, 3, 4, 7, 10, 12, 13, };
-        private int[] Process_Cappuccino_NoSugar = { 0, 1, 2, 3, 4, 8, 13, };
+        private int[] Process_Cappuccino_HalfSugar = { 0, 1, 2, 4, 7, 10, 12, 13, };
+        private int[] Process_Cappuccino_NoSugar = { 0, 1, 2, 4, 8, 13, };
         private int[] ThoughCoffee = { 14 };
 
         public Coffee_Procedure[] ProcedureTable = new Coffee_Procedure[15];
@@ -92,7 +92,7 @@ namespace CoffeeOK_ControlForm
         {
             switch (processid)
             {
-                case 5://拿铁加糖
+                case 4://拿铁加糖
                     return Process_Latte;
                     break;
                 case 8://拿铁半塘
@@ -122,6 +122,10 @@ namespace CoffeeOK_ControlForm
                 case 17://卡布奇诺 无糖
                     return Process_Cappuccino_NoSugar;
                     break;
+                case 19://摩卡，半糖
+                    return Process_Mocha_NoSugar;
+                    break;
+
                 default:
                     //出错，记录日志
                     break;
@@ -138,7 +142,7 @@ namespace CoffeeOK_ControlForm
         int ProcessID = 0;
         int ProductID = 0;
         string ProductName = "";
-        string M_str_sqlcon = "server=localhost;user id=root;password=1234;database=coffee"; //根据自己的设置
+        string M_str_sqlcon = "server=192.168.1.100;user id=root;password=gengku;database=coffee"; //根据自己的设置
         public Coffee_Process_FromDB(int processid)
         {
             Get_Coffee_Process_FromDB(processid);
@@ -149,7 +153,7 @@ namespace CoffeeOK_ControlForm
             return ProcessID;
         }
 
-        public void Get_Coffee_Process_FromDB(int processid)
+        public List<Coffee_Procedure> Get_Coffee_Process_FromDB(int processid)
         {
 
             MySqlConnection conn = null;
@@ -173,25 +177,49 @@ namespace CoffeeOK_ControlForm
             //其中执行状态意义如下：0为未执行，1为正在执行，2为已完成
             if (ds.Tables[0].Rows.Count > 0)
             {
+                int counter = 0;
                 for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                 {
-                    string sql1 = "select * from Procedure where ProcedureID = '" + ds.Tables[0].Rows[i][0].ToString() + "'";
+                    string str = ds.Tables[0].Rows[i][0].ToString();
+                    string sql1 = "select * from coffee_procedure where ProcedureID = " + str + "";
                     DataSet ds1 = new DataSet();
                     MySqlDataAdapter mda1 = new MySqlDataAdapter(sql1, conn);
-                    mda1.Fill(ds1, "claim_goods_list");
-
-                    string ProcessID = ds1.Tables[0].Rows[0][6].ToString();
-                    MissionLists.Insert(int.Parse(ds1.Tables[0].Rows[0][0].ToString()),
-                                    new Coffee_Procedure(
-                                    ds1.Tables[0].Rows[0][1].ToString(),
-                                    int.Parse(ds1.Tables[0].Rows[0][2].ToString()),
-                                    int.Parse(ds1.Tables[0].Rows[0][0].ToString())
-                                    )
-                                    );
+                    mda1.Fill(ds1, "coffee_procedure");
+                    if (ds1.Tables[0].Rows.Count >= 1)
+                    {
+                        string ProcessID = ds1.Tables[0].Rows[0][1].ToString();
+                        MissionLists.Insert(counter,
+                                        new Coffee_Procedure(
+                                        ds1.Tables[0].Rows[0][0].ToString(),
+                                        int.Parse(ds1.Tables[0].Rows[0][2].ToString()),
+                                        int.Parse(ds1.Tables[0].Rows[0][1].ToString())
+                                        )
+                                        );
+                        counter++;
+                    }
 
                 }
             }
             conn.Close();
+
+            List<Coffee_Procedure> list1 = new List<Coffee_Procedure>();
+            Coffee_Procedure buf = new Coffee_Procedure("", 0, 0);
+            for (int i = 0; i < MissionLists.Count; i++)
+            {
+                for (int j = 0; j < MissionLists.Count; j++)
+                {
+                    int counter = 0;
+                    buf = MissionLists[j];
+                    if ((j + 1) < MissionLists.Count && MissionLists[j].ProcedureNumber > MissionLists[j + 1].ProcedureNumber)
+                    {
+                        Coffee_Procedure buf1 = MissionLists[j];
+                        MissionLists.RemoveAt(j);
+                        //MissionLists.Insert(j+1, buf);
+                        MissionLists.Insert(j + 1, buf);
+                    }
+                }
+            }
+            return MissionLists;
         }
 
 
