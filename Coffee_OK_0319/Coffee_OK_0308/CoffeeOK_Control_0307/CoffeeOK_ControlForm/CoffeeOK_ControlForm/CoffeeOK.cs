@@ -188,6 +188,8 @@ namespace CoffeeOK
         {
             //if (Conn.State == ConnectionState.Closed)
             //       Conn.Open();
+
+
             byte[] bytes = inputstring;// Encoding.UTF8.GetBytes(inputstring);//inputstring.Split(' ').Select(s => Convert.ToByte(s, 16)).ToArray();
             byte[] SHOW = bytes;
             byte[] crc = CalculateCRC(bytes);
