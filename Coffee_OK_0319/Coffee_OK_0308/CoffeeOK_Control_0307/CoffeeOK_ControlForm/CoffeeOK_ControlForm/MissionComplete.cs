@@ -311,6 +311,8 @@ namespace CoffeeOK_ControlForm
 
         /// <summary>
         /// 定时器2主要负责数据库查询及任务指令接收
+        /// 同时从数据库生成任务表
+        /// 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -1279,8 +1281,8 @@ namespace CoffeeOK_ControlForm
         private void button9_Click(object sender, EventArgs e)
         {//
             // ConnectMysql_DB();
-            Coffee_Process_FromDB cpdb = new Coffee_Process_FromDB(20);
-            int id=cpdb.Get_ProcessID();
+            //Coffee_Process_FromDB cpdb = new Coffee_Process_FromDB(20);
+            //int id=cpdb.Get_ProcessID();
             
             //InsertMysql_DB_TaskStatus(new Task("1", "1", DateTime.Now.ToString(), "0", "6", "1", "5"));
         }
