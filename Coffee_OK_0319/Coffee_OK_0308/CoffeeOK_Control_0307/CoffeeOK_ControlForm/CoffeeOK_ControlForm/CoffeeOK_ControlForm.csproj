@@ -78,6 +78,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RobertSimulation.cs" />
+    <Compile Include="Settings.cs" />
     <EmbeddedResource Include="CoffeeOK_Control_0322.resx">
       <DependentUpon>CoffeeOK_Control_0322.cs</DependentUpon>
     </EmbeddedResource>
